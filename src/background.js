@@ -36,6 +36,19 @@ var PLAYERS_PATTERN = [
     },
   },
   {
+    url: 'https://soundcloud.com/*',
+    commands: {
+      next: tab =>
+        'document.querySelector(".skipControl.playControls__next.skipControl__next").click()',
+      previous: tab =>
+        'document.querySelector(".playControls__prev.skipControl__previous").click()',
+      togglePlayPause: tab =>
+        'document.querySelector(".playControls__control.playControls__play").click()',
+      openLink: tab => chrome.tabs.update(tab.id, { active: true }),
+      shuffle: tab => 'document.querySelector(".shuffleControl.sc-ir").click()',
+    },
+  },
+  {
     url: 'https://beta.music.apple.com/*',
     commands: {
       next: tab => 'document.querySelector(\'[aria-label="Next"]\').click()',
