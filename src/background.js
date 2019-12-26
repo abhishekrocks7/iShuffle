@@ -26,6 +26,15 @@ var PLAYERS_PATTERN = [
     },
   },
   {
+    url: 'https://music.amazon.in/*',
+    commands: {
+      next: tab => 'document.querySelector(\'[aria-label="Play next song"]\').click()',
+      previous: tab => 'document.querySelector(\'[aria-label="Previous song"]\').click()',
+      togglePlayPause: tab => 'document.querySelector(\'[aria-label="Play and pause"]\').click()',
+      openLink: tab => chrome.tabs.update(tab.id, { active: true }),
+    },
+  },
+  {
     url: 'https://beta.music.apple.com/*',
     commands: {
       next: tab => 'document.querySelector(\'[aria-label="Next"]\').click()',
