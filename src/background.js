@@ -32,6 +32,7 @@ var PLAYERS_PATTERN = [
       previous: tab => 'document.querySelector(\'[aria-label="Previous song"]\').click()',
       togglePlayPause: tab => 'document.querySelector(\'[aria-label="Play and pause"]\').click()',
       openLink: tab => chrome.tabs.update(tab.id, { active: true }),
+      shuffle: tab => 'document.querySelector(".shuffleButton").click()',
     },
   },
   {

@@ -224,6 +224,10 @@ function Player() {
     }
   };
 
+  const handleShuffle = () => {
+    chrome.runtime.sendMessage({ message: 'shuffleTracks' });
+  };
+
   useEffect(() => {
     let value = localStorage.getItem('canMinimize');
     if (value === 'yes') {
@@ -302,8 +306,8 @@ function Player() {
         >
           <PreviousTrackIcon />
         </PreviousTrackButton>
-        <MenuButton onClick={() => handleMenu()} whileTap={{ scale: 0.92, opacity: 1 }}>
-          Menu
+        <MenuButton onClick={() => handleShuffle()} whileTap={{ scale: 0.92, opacity: 1 }}>
+          <ShuffleTrackIcon />
         </MenuButton>
         <OpenLinkButton onClick={() => handleOpenLink()} whileTap={{ scale: 0.92, opacity: 1 }}>
           <OpenLinkIcon />
