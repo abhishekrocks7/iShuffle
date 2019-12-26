@@ -160,7 +160,6 @@ function Player() {
         animate={{ width: minimize ? 32 : 160, height: minimize ? 32 : 160 }}
         className="playerView"
         drag
-        dragElastic={0.2}
         dragConstraints={constraintsRef}
       >
         <MimimizeView
