@@ -8,6 +8,7 @@ import {
   OpenLinkIcon,
   MinimizeIcon,
   ExpandIcon,
+  SpotifyIcon,
 } from './Icons';
 import { motion } from 'framer-motion';
 
@@ -100,14 +101,13 @@ const MenuButton = styled(motion.div)`
   cursor: pointer;
 `;
 
-const OpenLinkButton = styled(motion.div)`
+const ChannelSwitcherButton = styled(motion.div)`
   width: 100%;
   height: 100%;
   display: grid;
   place-items: center;
   grid-area: 3/2;
   cursor: pointer;
-  opacity: 0.7;
 `;
 
 const MimimizeView = styled(motion.div)`
@@ -198,9 +198,9 @@ function Player() {
           <MenuButton onClick={() => handleShuffle()} whileTap={{ scale: 0.92, opacity: 1 }}>
             <ShuffleTrackIcon />
           </MenuButton>
-          <OpenLinkButton onClick={() => handleOpenLink()} whileTap={{ scale: 0.92, opacity: 1 }}>
-            <OpenLinkIcon />
-          </OpenLinkButton>
+          <ChannelSwitcherButton whileTap={{ scale: 0.92, opacity: 1 }}>
+            <SpotifyIcon />
+          </ChannelSwitcherButton>
         </PlayerControlWheel>
       </PlayerView>
     </Fragment>
