@@ -9,6 +9,11 @@ module.exports = {
     popup: './src/popup.js',
     content: './src/content.js',
     background: './src/background.js',
+    spotifyContentScript: './src/spotifyContentScript.js',
+    amazonMusicContentScript: './src/amazonMusicContentScript.js',
+    appleMusicContentScript: './src/appleMusicContentScript.js',
+    soundCloudContentScript: './src/soundCloudContentScript.js',
+    youtubeContentScript: './src/youtubeContentScript.js',
   },
   output: {
     filename: '[name].js',

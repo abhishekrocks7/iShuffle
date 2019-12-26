@@ -17,6 +17,31 @@
       "all_frames": false,
       "matches": ["http://*/*", "https://*/*"],
       "js": ["content.js"]
+    },
+    {
+      "all_frames": false,
+      "matches": ["https://open.spotify.com/*"],
+      "js": ["spotifyContentScript.js"]
+    },
+    {
+      "all_frames": false,
+      "matches": ["https://music.amazon.in/*"],
+      "js": ["amazonMusicContentScript.js"]
+    },
+    {
+      "all_frames": false,
+      "matches": ["https://beta.music.apple.com/*"],
+      "js": ["appleMusicContentScript.js"]
+    },
+    {
+      "all_frames": false,
+      "matches": ["https://soundcloud.com/*"],
+      "js": ["soundCloudContentScript.js"]
+    },
+    {
+      "all_frames": false,
+      "matches": ["https://www.youtube.com/watch?*"],
+      "js": ["youtubeContentScript.js"]
     }
   ],
   "icons": {
@@ -24,7 +49,7 @@
     "48": "assets/img/icon-48x48.png",
     "128": "assets/img/icon-128x128.png"
   },
-  "permissions": ["storage", "tabs", "http://*/", "https://*/"],
+  "permissions": ["storage", "activeTab", "tabs", "http://*/", "https://*/"],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'; connect-src ws://localhost:*/",
   "web_accessible_resources": ["assets/img/*"]
 }

@@ -127,30 +127,28 @@ const MimimizeView = styled(motion.div)`
 
 function Player() {
   const [minimize, setMinimize] = useState(false);
+  const [activeChannel, setActiveChannel] = useState('Spotify');
 
   const handleTogglePlay = () => {
     console.log('toggle playPause click');
-    chrome.runtime.sendMessage({ message: 'togglePlayPause' });
+
+    chrome.extension.sendRequest({ message: 'togglePlayPause', channel: activeChannel });
   };
 
   const handleNextTrack = () => {
-    chrome.runtime.sendMessage({ message: 'playNextTrack' });
+    chrome.extension.sendRequest({ message: 'playNextTrack', channel: activeChannel });
   };
 
   const handlePreviousTrack = () => {
-    chrome.runtime.sendMessage({ message: 'playPreviousTrack' });
+    chrome.extension.sendRequest({ message: 'playPreviousTrack', channel: activeChannel });
   };
 
-  const handleOpenLink = () => {
-    chrome.runtime.sendMessage({ message: 'openLink' });
+  const handleShuffle = () => {
+    chrome.extension.sendRequest({ message: 'shuffleTracks', channel: activeChannel });
   };
 
   const handleMinimize = () => {
     setMinimize(!minimize);
-  };
-
-  const handleShuffle = () => {
-    chrome.runtime.sendMessage({ message: 'shuffleTracks' });
   };
 
   const constraintsRef = useRef(null);
