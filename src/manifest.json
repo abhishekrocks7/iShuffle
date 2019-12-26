@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "version": "1.0.0",
-  "name": "__MSG_appName__",
-  "short_name": "__MSG_appShortName__",
-  "description": "__MSG_appDesc__",
+  "name": "iShuffle",
+  "short_name": "iShuffle",
+  "description": "App to control Apple Music, Spotify, SoundCloud and Amazon Music Media Player.",
   "default_locale": "en",
   "options_ui": {
     "page": "options.html"
