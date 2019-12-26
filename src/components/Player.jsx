@@ -179,6 +179,11 @@ const Seperator = styled.div`
   background-color: rgba(255, 255, 255, 0.1);
 `;
 
+const Attribute = styled.a`
+  color: #fff;
+  text-decoration: none;
+`;
+
 function Player() {
   const [minimize, setMinimize] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
