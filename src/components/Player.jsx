@@ -94,7 +94,7 @@ const PreviousTrackButton = styled(motion.div)`
   opacity: 0.7;
 `;
 
-const MenuButton = styled(motion.div)`
+const ShuffleButton = styled(motion.div)`
   width: 100%;
   height: 100%;
   display: grid;
@@ -105,9 +105,10 @@ const MenuButton = styled(motion.div)`
   line-height: 16px;
   font-weight: 600;
   color: #fff;
-  opacity: 0.7;
+  opacity: ${props => (props.isDisabled ? 0.3 : 0.7)};
   text-transform: uppercase;
-  cursor: pointer;
+  cursor: ${props => (props.isDisabled ? 'auto' : 'pointer')};
+  pointer-events: ${props => props.isDisabled && 'none'};
 `;
 
 const ChannelSwitcherButton = styled(motion.div)`
@@ -367,9 +368,13 @@ function Player() {
           >
             <PreviousTrackIcon />
           </PreviousTrackButton>
-          <MenuButton onClick={() => handleShuffle()} whileTap={{ scale: 0.92, opacity: 1 }}>
+          <ShuffleButton
+            isDisabled={activeChannel === 'Youtube'}
+            onClick={() => handleShuffle()}
+            whileTap={{ scale: 0.92, opacity: 1 }}
+          >
             <ShuffleTrackIcon />
-          </MenuButton>
+          </ShuffleButton>
           <ChannelSwitcherButton
             onClick={() => handleChannelSwitcher()}
             whileTap={{ scale: 0.92, opacity: 1 }}
