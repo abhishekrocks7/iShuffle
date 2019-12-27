@@ -1,16 +1,21 @@
-import React, { useState, Fragment, useRef } from 'react';
+import React, { useState, Fragment, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   TogglePlayIcon,
   NextTrackIcon,
   PreviousTrackIcon,
   ShuffleTrackIcon,
-  OpenLinkIcon,
+  DropdownIcon,
   MinimizeIcon,
   ExpandIcon,
   SpotifyIcon,
+  CloseIcon,
+  AmazonIcon,
+  YouTubeIcon,
+  AppleIcon,
+  SoundCloudIcon,
 } from './Icons';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -35,6 +40,10 @@ const PlayerView = styled(motion.div)`
   z-index: 9999999999999999;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Open Sans', 'Helvetica Neue', sans-serif;
+
+  * {
+    box-sizing: border-box;
+  }
 
   &:hover {
     .minimizeIcon {
@@ -106,8 +115,14 @@ const ChannelSwitcherButton = styled(motion.div)`
   height: 100%;
   display: grid;
   place-items: center;
+  justify-content: center;
+  grid-template-columns: 14px 6px;
+  grid-gap: 4px;
   grid-area: 3/2;
   cursor: pointer;
+  svg:first-child {
+    transform: scale(0.4);
+  }
 `;
 
 const MimimizeView = styled(motion.div)`
@@ -125,13 +140,93 @@ const MimimizeView = styled(motion.div)`
   transition: all 300ms ease-in-out;
 `;
 
+const ChannelSwitcherView = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(20px);
+  z-index: 2;
+  border-radius: 8px;
+`;
+
+const Header = styled.div`
+  width: 100%;
+  height: 40px;
+  padding-left: 16px;
+  padding-right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Title = styled.div`
+  font-size: 14px;
+  line-height: 20px;
+  color: #fff;
+  font-weight: 300;
+`;
+
+const CloseView = styled(motion.div)`
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  svg {
+    opacity: 0.6;
+  }
+`;
+
+const List = styled(motion.div)`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-items: center;
+  width: 100%;
+  height: calc(100% - 40px);
+`;
+
+const Channel = styled(motion.div)`
+  padding: 0 16px;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  &:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+`;
+
+const ChannelIcon = styled.div`
+  opacity: 0.7;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+`;
+
 function Player() {
   const [minimize, setMinimize] = useState(false);
-  const [activeChannel, setActiveChannel] = useState('Spotify');
+  const [activeChannel, setActiveChannel] = useState('');
+  const [isChannelSwitcherOpen, setChannelSwitcherOpen] = useState(false);
+  const [channels] = useState(['Apple', 'Spotify', 'Amazon', 'Youtube', 'SoundCloud']);
 
   const handleTogglePlay = () => {
     console.log('toggle playPause click');
-
+    console.log('active channel is ', activeChannel);
     chrome.extension.sendRequest({ message: 'togglePlayPause', channel: activeChannel });
   };
 
@@ -151,17 +246,86 @@ function Player() {
     setMinimize(!minimize);
   };
 
+  const renderIconForService = channel => {
+    switch (channel) {
+      case 'Amazon':
+        return <AmazonIcon />;
+      case 'Apple':
+        return <AppleIcon />;
+      case 'Youtube':
+        return <YouTubeIcon />;
+      case 'SoundCloud':
+        return <SoundCloudIcon />;
+      case 'Spotify':
+        return <SpotifyIcon />;
+      default:
+        return <SpotifyIcon />;
+    }
+  };
+
+  const handleChannelSwitcher = () => {
+    setChannelSwitcherOpen(true);
+  };
+
+  const handleSelectedChannel = channel => {
+    chrome.storage.sync.set({ activeChannel: channel }, function() {
+      console.log('activeChannel is set to ' + channel);
+      setActiveChannel(channel);
+      setChannelSwitcherOpen(false);
+    });
+  };
+
+  const closeChannelSwitcher = () => {
+    setChannelSwitcherOpen(false);
+  };
+
   const constraintsRef = useRef(null);
+
+  useEffect(() => {
+    chrome.storage.sync.get(['activeChannel'], function(result) {
+      console.log('Value currently is ' + result.activeChannel);
+      setActiveChannel(result.activeChannel);
+    });
+  });
 
   return (
     <Fragment>
       <Wrapper ref={constraintsRef} />
+
       <PlayerView
-        animate={{ width: minimize ? 32 : 160, height: minimize ? 32 : 160 }}
+        animate={{
+          width: minimize ? 32 : 160,
+          height: minimize ? 32 : isChannelSwitcherOpen ? 240 : 160,
+        }}
         className="playerView"
         drag
         dragConstraints={constraintsRef}
       >
+        <AnimatePresence>
+          {isChannelSwitcherOpen && (
+            <ChannelSwitcherView
+              key="channelSwitcher"
+              initial={{ scale: 0, display: 'none' }}
+              animate={{ scale: 1, display: 'block' }}
+              exit={{ opacity: 0, display: 'none' }}
+            >
+              <Header>
+                <Title>Select a service</Title>
+                <CloseView onClick={() => closeChannelSwitcher()}>
+                  <CloseIcon />
+                </CloseView>
+              </Header>
+              <List>
+                {channels &&
+                  channels.map(channel => (
+                    <Channel onClick={() => handleSelectedChannel(channel)} key={channel}>
+                      <ChannelIcon>{renderIconForService(channel)}</ChannelIcon>
+                    </Channel>
+                  ))}
+              </List>
+            </ChannelSwitcherView>
+          )}
+        </AnimatePresence>
         <MimimizeView
           className={'minimizeIcon'}
           isMinimized={minimize}
@@ -197,8 +361,12 @@ function Player() {
           <MenuButton onClick={() => handleShuffle()} whileTap={{ scale: 0.92, opacity: 1 }}>
             <ShuffleTrackIcon />
           </MenuButton>
-          <ChannelSwitcherButton whileTap={{ scale: 0.92, opacity: 1 }}>
-            <SpotifyIcon />
+          <ChannelSwitcherButton
+            onClick={() => handleChannelSwitcher()}
+            whileTap={{ scale: 0.92, opacity: 1 }}
+          >
+            {renderIconForService(activeChannel)}
+            <DropdownIcon />
           </ChannelSwitcherButton>
         </PlayerControlWheel>
       </PlayerView>
