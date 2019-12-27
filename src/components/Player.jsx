@@ -196,6 +196,7 @@ const List = styled(motion.div)`
 const Channel = styled(motion.div)`
   padding: 0 16px;
   cursor: pointer;
+  opacity: 0.7;
   width: 100%;
   height: 100%;
   display: flex;
@@ -211,7 +212,6 @@ const Channel = styled(motion.div)`
 `;
 
 const ChannelIcon = styled.div`
-  opacity: 0.7;
   width: 100%;
   height: 100%;
   display: grid;
@@ -311,14 +311,23 @@ function Player() {
             >
               <Header>
                 <Title>Select Service</Title>
-                <CloseView onClick={() => closeChannelSwitcher()}>
+                <CloseView
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ opacity: 1, scale: 0.96 }}
+                  onClick={() => closeChannelSwitcher()}
+                >
                   <CloseIcon />
                 </CloseView>
               </Header>
               <List>
                 {channels &&
                   channels.map(channel => (
-                    <Channel onClick={() => handleSelectedChannel(channel)} key={channel}>
+                    <Channel
+                      whileTap={{ scale: 0.96 }}
+                      whileHover={{ opacity: 1 }}
+                      onClick={() => handleSelectedChannel(channel)}
+                      key={channel}
+                    >
                       <ChannelIcon>{renderIconForService(channel)}</ChannelIcon>
                     </Channel>
                   ))}
