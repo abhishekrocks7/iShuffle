@@ -311,7 +311,7 @@ function Player() {
               exit={{ opacity: 0, display: 'none' }}
             >
               <Header>
-                <Title>Select Service</Title>
+                <Title>Choose Service</Title>
                 <CloseView
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ opacity: 1, scale: 0.96 }}
