@@ -310,7 +310,7 @@ function Player() {
               exit={{ opacity: 0, display: 'none' }}
             >
               <Header>
-                <Title>Select a service</Title>
+                <Title>Select Service</Title>
                 <CloseView onClick={() => closeChannelSwitcher()}>
                   <CloseIcon />
                 </CloseView>
