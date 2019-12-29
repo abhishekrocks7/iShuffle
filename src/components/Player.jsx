@@ -319,10 +319,8 @@ function Player() {
           ' for channel ',
           request.channel
         );
-
         setShuffleChannel(request.channel);
         setShuffleActive(request.message === 'active' ? true : false);
-
         break;
       default:
         console.log('received some other message');
@@ -430,4 +428,4 @@ function Player() {
   );
 }
 
-export default Player;
+export default React.memo(Player);
