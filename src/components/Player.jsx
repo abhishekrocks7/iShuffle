@@ -109,6 +109,9 @@ const ShuffleButton = styled(motion.div)`
   text-transform: uppercase;
   cursor: ${props => (props.isDisabled ? 'auto' : 'pointer')};
   pointer-events: ${props => props.isDisabled && 'none'};
+  svg path {
+    fill: ${props => (props.shuffleState ? '#15c182' : '#fff')};
+  }
 `;
 
 const ChannelSwitcherButton = styled(motion.div)`
@@ -224,23 +227,41 @@ function Player() {
   const [activeChannel, setActiveChannel] = useState('');
   const [isChannelSwitcherOpen, setChannelSwitcherOpen] = useState(false);
   const [channels] = useState(['Apple', 'Spotify', 'Amazon', 'Youtube', 'SoundCloud']);
+  const [isShuffleActive, setShuffleActive] = useState(false);
+  const [shuffleChannel, setShuffleChannel] = useState('');
 
   const handleTogglePlay = () => {
     console.log('toggle playPause click');
     console.log('active channel is ', activeChannel);
-    chrome.runtime.sendMessage({ message: 'togglePlayPause', channel: activeChannel });
+    chrome.runtime.sendMessage({
+      type: 'controllerState',
+      message: 'togglePlayPause',
+      channel: activeChannel,
+    });
   };
 
   const handleNextTrack = () => {
-    chrome.runtime.sendMessage({ message: 'playNextTrack', channel: activeChannel });
+    chrome.runtime.sendMessage({
+      type: 'controllerState',
+      message: 'playNextTrack',
+      channel: activeChannel,
+    });
   };
 
   const handlePreviousTrack = () => {
-    chrome.runtime.sendMessage({ message: 'playPreviousTrack', channel: activeChannel });
+    chrome.runtime.sendMessage({
+      type: 'controllerState',
+      message: 'playPreviousTrack',
+      channel: activeChannel,
+    });
   };
 
   const handleShuffle = () => {
-    chrome.runtime.sendMessage({ message: 'shuffleTracks', channel: activeChannel });
+    chrome.runtime.sendMessage({
+      type: 'controllerState',
+      message: 'shuffleTracks',
+      channel: activeChannel,
+    });
   };
 
   const handleMinimize = () => {
@@ -287,6 +308,26 @@ function Player() {
       console.log('Value currently is ' + result.activeChannel);
       setActiveChannel(result.activeChannel);
     });
+  }, []);
+
+  chrome.runtime.onMessage.addListener(function(request, sender) {
+    switch (request.type) {
+      case 'shuffleState':
+        console.log(
+          'request received from bg script is ',
+          request.message,
+          ' for channel ',
+          request.channel
+        );
+
+        setShuffleChannel(request.channel);
+        setShuffleActive(request.message === 'active' ? true : false);
+
+        break;
+      default:
+        console.log('received some other message');
+        break;
+    }
   });
 
   return (
@@ -370,6 +411,7 @@ function Player() {
           </PreviousTrackButton>
           <ShuffleButton
             isDisabled={activeChannel === 'Youtube'}
+            shuffleState={activeChannel === shuffleChannel && isShuffleActive}
             onClick={() => handleShuffle()}
             whileTap={{ scale: 0.92, opacity: 1 }}
           >
