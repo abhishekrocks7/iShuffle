@@ -37,3 +37,27 @@ spotifyControls();
 //   let shuffleButtonTitle = shuffleButton.title;
 //   chrome.runtime.sendMessage({ showIconForState: shuffleButtonTitle });
 // });
+
+function findShuffleState() {
+  setTimeout(() => {
+    if (document.querySelector('.spoticon-shuffle-16').title === 'Disable shuffle') {
+      console.log('shuffle is active');
+      chrome.runtime.sendMessage({ type: 'shuffleState', message: 'active', channel: 'Spotify' });
+    } else {
+      console.log('shuffle is inactive');
+      chrome.runtime.sendMessage({
+        type: 'shuffleState',
+        message: 'inactive',
+        channel: 'Spotify',
+      });
+    }
+  }, 3500);
+}
+
+window.addEventListener('load', () => {
+  findShuffleState();
+
+  document.querySelector('.spoticon-shuffle-16').addEventListener('click', () => {
+    findShuffleState();
+  });
+});
