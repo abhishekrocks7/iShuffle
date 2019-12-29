@@ -21,3 +21,27 @@ function amazonMusicControls() {
 }
 
 amazonMusicControls();
+
+function findShuffleState() {
+  setTimeout(() => {
+    if (document.querySelector('.shuffleButton').classList.contains('on')) {
+      console.log('shuffle is active');
+      chrome.runtime.sendMessage({ type: 'shuffleState', message: 'active', channel: 'Amazon' });
+    } else {
+      console.log('shuffle is inactive');
+      chrome.runtime.sendMessage({
+        type: 'shuffleState',
+        message: 'inactive',
+        channel: 'Amazon',
+      });
+    }
+  }, 2000);
+}
+
+window.addEventListener('load', () => {
+  findShuffleState();
+
+  document.querySelector('.shuffleButton').addEventListener('click', () => {
+    findShuffleState();
+  });
+});
