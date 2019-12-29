@@ -1,5 +1,5 @@
 function dispatchAction(tabId, code) {
-  chrome.tabs.executeScript(tabId, { code: code });
+  code && chrome.tabs.executeScript(tabId, { code: code });
 }
 
 function getChannelUrl(channel) {
@@ -96,7 +96,7 @@ function runCodeFor(message, channel) {
   }
 }
 
-chrome.extension.onRequest.addListener(function(request, sender) {
+chrome.runtime.onMessage.addListener(function(request, sender) {
   chrome.tabs.query({ url: getChannelUrl(request.channel) }, function(tabs) {
     dispatchAction(
       tabs && tabs.length >= 1 && tabs[0].id,
@@ -104,3 +104,5 @@ chrome.extension.onRequest.addListener(function(request, sender) {
     );
   });
 });
+
+//expermiment

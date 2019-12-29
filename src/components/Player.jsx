@@ -228,19 +228,19 @@ function Player() {
   const handleTogglePlay = () => {
     console.log('toggle playPause click');
     console.log('active channel is ', activeChannel);
-    chrome.extension.sendRequest({ message: 'togglePlayPause', channel: activeChannel });
+    chrome.runtime.sendMessage({ message: 'togglePlayPause', channel: activeChannel });
   };
 
   const handleNextTrack = () => {
-    chrome.extension.sendRequest({ message: 'playNextTrack', channel: activeChannel });
+    chrome.runtime.sendMessage({ message: 'playNextTrack', channel: activeChannel });
   };
 
   const handlePreviousTrack = () => {
-    chrome.extension.sendRequest({ message: 'playPreviousTrack', channel: activeChannel });
+    chrome.runtime.sendMessage({ message: 'playPreviousTrack', channel: activeChannel });
   };
 
   const handleShuffle = () => {
-    chrome.extension.sendRequest({ message: 'shuffleTracks', channel: activeChannel });
+    chrome.runtime.sendMessage({ message: 'shuffleTracks', channel: activeChannel });
   };
 
   const handleMinimize = () => {

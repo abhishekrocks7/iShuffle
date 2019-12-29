@@ -26,3 +26,14 @@
 // }
 
 // spotifyControls();
+
+// let shuffleButton = document.querySelector('.spoticon-shuffle-16');
+
+// window.addEventListener('load', () => {
+//   shuffleButton = document.querySelector('.spoticon-shuffle-16') || shuffleButton;
+// });
+
+// shuffleButton.addEventListener('click', function() {
+//   let shuffleButtonTitle = shuffleButton.title;
+//   chrome.runtime.sendMessage({ showIconForState: shuffleButtonTitle });
+// });
