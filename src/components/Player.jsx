@@ -231,8 +231,6 @@ function Player() {
   const [shuffleChannel, setShuffleChannel] = useState('');
 
   const handleTogglePlay = () => {
-    console.log('toggle playPause click');
-    console.log('active channel is ', activeChannel);
     chrome.runtime.sendMessage({
       type: 'controllerState',
       message: 'togglePlayPause',
@@ -264,10 +262,6 @@ function Player() {
     });
   };
 
-  const handleMinimize = () => {
-    setMinimize(!minimize);
-  };
-
   const renderIconForService = channel => {
     switch (channel) {
       case 'Amazon':
@@ -289,9 +283,15 @@ function Player() {
     setChannelSwitcherOpen(true);
   };
 
+  const handleMinimize = state => {
+    console.log('minimizze@@@ state is ', state);
+    chrome.storage.sync.set({ isMinimize: state }, function() {
+      setMinimize(state);
+    });
+  };
+
   const handleSelectedChannel = channel => {
     chrome.storage.sync.set({ activeChannel: channel }, function() {
-      console.log('activeChannel is set to ' + channel);
       setActiveChannel(channel);
       setChannelSwitcherOpen(false);
     });
@@ -304,21 +304,20 @@ function Player() {
   const constraintsRef = useRef(null);
 
   useEffect(() => {
-    chrome.storage.sync.get(['activeChannel'], function(result) {
-      console.log('Value currently is ' + result.activeChannel);
+    chrome.storage.sync.get(['activeChannel'], result => {
       setActiveChannel(result.activeChannel);
+    });
+  }, []);
+
+  useEffect(() => {
+    chrome.storage.sync.get(['isMinimize'], result => {
+      setMinimize(result.isMinimize);
     });
   }, []);
 
   chrome.runtime.onMessage.addListener(function(request, sender) {
     switch (request.type) {
       case 'shuffleState':
-        console.log(
-          'request received from bg script is ',
-          request.message,
-          ' for channel ',
-          request.channel
-        );
         setShuffleChannel(request.channel);
         setShuffleActive(request.message === 'active' ? true : false);
         break;
@@ -334,6 +333,7 @@ function Player() {
 
       <PlayerView
         animate={{
+          visibility: 'visible',
           width: minimize ? 32 : 160,
           height: minimize ? 32 : isChannelSwitcherOpen ? 240 : 160,
         }}
@@ -384,12 +384,13 @@ function Player() {
               : { backgroundColor: 'rgba(0,0,0,0.4)' }
           }
           transition={{ duration: 0 }}
-          onClick={() => handleMinimize()}
+          onClick={() => handleMinimize(!minimize)}
         >
           {minimize ? <ExpandIcon /> : <MinimizeIcon />}
         </MimimizeView>
 
         <PlayerControlWheel
+          initial={false}
           animate={minimize ? { display: 'none', opacity: 0 } : { display: 'grid', opacity: 1 }}
         >
           <TogglePlayButton
