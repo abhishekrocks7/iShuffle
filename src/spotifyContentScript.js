@@ -1,63 +1,61 @@
-function spotifyControls() {
-  chrome.runtime.onMessage.addListener(function(request, sender) {
-    if (request.message === 'playNextTrack') {
-      console.log('tabId is ', request.tabId);
-      document.querySelector('.spoticon-skip-forward-16').click();
-    }
-    if (request.message === 'playPreviousTrack') {
-      console.log('tabId is ', request.tabId);
-      document.querySelector('.spoticon-skip-back-16').click();
-    }
-    if (request.message === 'shuffleTracks') {
-      console.log('tabId is ', request.tabId);
-      let shuffleButton = document.querySelector('.spoticon-shuffle-16');
-      shuffleButton.click();
-    }
-    if (request.message === 'togglePlayPause') {
-      console.log('tabId is ', request.tabId);
-      var pauseBttn = document.querySelector('.spoticon-pause-16');
-      if (pauseBttn != null) {
-        pauseBttn.click();
-      } else {
-        document.querySelector('.spoticon-play-16').click();
-      }
-    }
-  });
-}
-
-spotifyControls();
-
-// let shuffleButton = document.querySelector('.spoticon-shuffle-16');
-
 // window.addEventListener('load', () => {
-//   shuffleButton = document.querySelector('.spoticon-shuffle-16') || shuffleButton;
+//   getShuffleState();
 // });
 
-// shuffleButton.addEventListener('click', function() {
-//   let shuffleButtonTitle = shuffleButton.title;
-//   chrome.runtime.sendMessage({ showIconForState: shuffleButtonTitle });
-// });
-
-function findShuffleState() {
-  setTimeout(() => {
-    if (document.querySelector('.spoticon-shuffle-16').title === 'Disable shuffle') {
-      console.log('shuffle is active');
-      chrome.runtime.sendMessage({ type: 'shuffleState', message: 'active', channel: 'Spotify' });
-    } else {
-      console.log('shuffle is inactive');
-      chrome.runtime.sendMessage({
-        type: 'shuffleState',
-        message: 'inactive',
-        channel: 'Spotify',
-      });
-    }
-  }, 3500);
+function getShuffleState() {
+  if (document.querySelector('.spoticon-shuffle-16').classList.contains('control-button--active')) {
+    chrome.runtime.sendMessage({
+      service: 'Spotify',
+      type: 'shuffleState',
+      message: 'active',
+      origin: 'iShuffle',
+    });
+  } else {
+    chrome.runtime.sendMessage({
+      service: 'Spotify',
+      type: 'shuffleState',
+      message: 'inactive',
+      origin: 'iShuffle',
+    });
+  }
 }
 
-window.addEventListener('load', () => {
-  findShuffleState();
+function getPlayButtonState() {
+  if (document.querySelector('.spoticon-pause-16') !== null) {
+    console.log('show pause icon');
+    chrome.runtime.sendMessage({
+      service: 'Spotify',
+      type: 'playButtonState',
+      message: 'active',
+      origin: 'iShuffle',
+    });
+  } else {
+    console.log('show play icon');
+    chrome.runtime.sendMessage({
+      service: 'Spotify',
+      type: 'playButtonState',
+      message: 'inactive',
+      origin: 'iShuffle',
+    });
+  }
+}
 
-  document.querySelector('.spoticon-shuffle-16').addEventListener('click', () => {
-    findShuffleState();
-  });
+chrome.runtime.onMessage.addListener(function(request, sender) {
+  if (request.origin === 'iShuffle') {
+    switch (request.message) {
+      case 'shuffleTracks':
+        setTimeout(() => {
+          getShuffleState();
+        }, 3500);
+        break;
+      case 'togglePlayPause':
+        console.log('received request for togglePlay pause ##', request);
+        setTimeout(() => {
+          getPlayButtonState();
+        }, 3500);
+        break;
+      default:
+        break;
+    }
+  }
 });

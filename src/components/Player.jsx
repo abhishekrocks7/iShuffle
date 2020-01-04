@@ -1,429 +1,270 @@
-import React, { useState, Fragment, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import {
+  SmallSpotifyIcon,
+  DropdownIcon,
   TogglePlayIcon,
+  PlayIcon,
   NextTrackIcon,
   PreviousTrackIcon,
   ShuffleTrackIcon,
-  DropdownIcon,
-  MinimizeIcon,
-  ExpandIcon,
-  SpotifyIcon,
-  CloseIcon,
-  AmazonIcon,
+  MoreIcon,
+  PauseIcon,
   YouTubeIcon,
   AppleIcon,
+  AmazonIcon,
   SoundCloudIcon,
 } from './Icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Fragment } from 'preact';
 
 const Wrapper = styled.div`
   position: fixed;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
+  top: 68px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
   background-color: transparent;
   visibility: hidden;
 `;
 
 const PlayerView = styled(motion.div)`
-  width: 160px;
-  height: 160px;
-  border-radius: 12px;
+  box-sizing: border-box;
   position: fixed;
-  bottom: 16px;
-  background: rgba(20, 20, 20, 0.8);
-  backdrop-filter: blur(30px);
+  bottom: 12px;
+
   display: grid;
-  place-items: center;
-  z-index: 9999999999999999;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
-
-  * {
-    box-sizing: border-box;
-  }
-
-  &:hover {
-    .minimizeIcon {
-      opacity: 1;
-    }
-  }
-`;
-
-const PlayerControlWheel = styled(motion.div)`
-  width: 90%;
-  height: 90%;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.4);
-  position: relative;
-  display: grid;
-  grid-template-rows: 44px 56px 44px;
-  grid-template-columns: 44px 56px 44px;
-`;
-
-const TogglePlayButton = styled(motion.div)`
-  grid-area: 2/2;
-  width: 56px;
+  grid-template-columns: 48px 1px 32px 32px 32px 1px 32px;
+  grid-column-gap: 12px;
   height: 56px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
+  padding: 12px;
+  background: linear-gradient(
+      95.87deg,
+      #080811 0.29%,
+      #0b2020 20.46%,
+      #0f0e36 49.95%,
+      #330b23 99.61%
+    ),
+    #080811;
+  border-radius: 12px;
+  z-index: 999999999999999;
 `;
 
-const NextTrackButton = styled(motion.div)`
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  grid-area: 2/3/3/3;
-  cursor: pointer;
-  opacity: 0.7;
+const Seperator = styled.div`
+  width: 1px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.1);
 `;
 
-const PreviousTrackButton = styled(motion.div)`
+const ActionItem = styled(motion.div)`
   width: 100%;
-  height: 100%;
+  height: 32px;
   display: grid;
   place-items: center;
-  grid-area: 2/2/2/1;
   cursor: pointer;
-  opacity: 0.7;
-`;
-
-const ShuffleButton = styled(motion.div)`
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  grid-area: 2/2/1/2;
-  font-size: 11px;
-  letter-spacing: 1px;
-  line-height: 16px;
-  font-weight: 600;
-  color: #fff;
-  opacity: ${props => (props.isDisabled ? 0.3 : 0.7)};
-  text-transform: uppercase;
-  cursor: ${props => (props.isDisabled ? 'auto' : 'pointer')};
-  pointer-events: ${props => props.isDisabled && 'none'};
+  background-color: ${props =>
+    props.type === 'serviceSwitcher' || props.active
+      ? 'rgba(55, 225, 163, 0.1)'
+      : 'rgba(255, 255, 255, 0.1)'};
+  border-radius: 16px;
   svg path {
-    fill: ${props => (props.shuffleState ? '#15c182' : '#fff')};
+    fill: ${props => (props.active ? '#37E1A3' : '#fff')};
   }
 `;
 
-const ChannelSwitcherButton = styled(motion.div)`
-  width: 100%;
-  height: 100%;
+const SelectedServiceWrapper = styled.div`
   display: grid;
-  place-items: center;
-  justify-content: center;
-  grid-template-columns: 14px 6px;
+  grid-template-columns: 20px 5px;
   grid-gap: 4px;
-  grid-area: 3/2;
-  cursor: pointer;
-  svg:first-child {
-    transform: scale(0.4);
-  }
+  align-items: center;
 `;
 
-const MimimizeView = styled(motion.div)`
-  width: 24px;
-  height: 24px;
-  background-color: rgba(0, 0, 0, 0.8);
-  border-radius: 50%;
+const ServiceSelector = styled(motion.div)`
+  background: rgba(0, 0, 0, 0.4);
+  height: 56px;
   position: absolute;
-  left: 4px;
-  bottom: 4px;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  opacity: ${props => (props.isMinimized ? 1 : 0)};
-  transition: all 300ms ease-in-out;
-`;
-
-const ChannelSwitcherView = styled(motion.div)`
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(20px);
-  z-index: 2;
-  border-radius: 8px;
-`;
-
-const Header = styled.div`
-  width: 100%;
-  height: 40px;
-  padding-left: 16px;
-  padding-right: 12px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(5, 40px);
+  grid-gap: 12px;
   align-items: center;
-`;
-
-const Title = styled.div`
-  font-size: 14px;
-  line-height: 20px;
-  color: #fff;
-  font-weight: 300;
-`;
-
-const CloseView = styled(motion.div)`
-  width: 20px;
-  height: 20px;
-  background-color: rgba(255, 255, 255, 0.1);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  border-radius: 50%;
-  svg {
-    opacity: 0.6;
-  }
-`;
-
-const List = styled(motion.div)`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  place-items: center;
-  width: 100%;
-  height: calc(100% - 40px);
-`;
-
-const Channel = styled(motion.div)`
-  padding: 0 16px;
-  cursor: pointer;
-  opacity: 0.7;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
-  &:last-child {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-  }
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-  }
-`;
-
-const ChannelIcon = styled.div`
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 `;
 
 function Player() {
-  const [minimize, setMinimize] = useState(false);
-  const [activeChannel, setActiveChannel] = useState('');
-  const [isChannelSwitcherOpen, setChannelSwitcherOpen] = useState(false);
-  const [channels] = useState(['Apple', 'Spotify', 'Amazon', 'Youtube', 'SoundCloud']);
+  //States
+  const [activeService, setActiveService] = useState('Spotify');
   const [isShuffleActive, setShuffleActive] = useState(false);
-  const [shuffleChannel, setShuffleChannel] = useState('');
+  const [isPlaying, setPlaying] = useState(false);
+  const [isServiceSelectionOpen, setIsServiceSelectionOpen] = useState(false);
 
-  const handleTogglePlay = () => {
-    chrome.runtime.sendMessage({
-      type: 'controllerState',
-      message: 'togglePlayPause',
-      channel: activeChannel,
-    });
-  };
-
-  const handleNextTrack = () => {
-    chrome.runtime.sendMessage({
-      type: 'controllerState',
-      message: 'playNextTrack',
-      channel: activeChannel,
-    });
-  };
-
-  const handlePreviousTrack = () => {
-    chrome.runtime.sendMessage({
-      type: 'controllerState',
-      message: 'playPreviousTrack',
-      channel: activeChannel,
-    });
-  };
-
-  const handleShuffle = () => {
-    chrome.runtime.sendMessage({
-      type: 'controllerState',
-      message: 'shuffleTracks',
-      channel: activeChannel,
-    });
-  };
-
-  const renderIconForService = channel => {
-    switch (channel) {
-      case 'Amazon':
-        return <AmazonIcon />;
-      case 'Apple':
-        return <AppleIcon />;
-      case 'Youtube':
-        return <YouTubeIcon />;
-      case 'SoundCloud':
-        return <SoundCloudIcon />;
-      case 'Spotify':
-        return <SpotifyIcon />;
-      default:
-        return <SpotifyIcon />;
-    }
-  };
-
-  const handleChannelSwitcher = () => {
-    setChannelSwitcherOpen(true);
-  };
-
-  const handleMinimize = state => {
-    console.log('minimizze@@@ state is ', state);
-    chrome.storage.sync.set({ isMinimize: state }, function() {
-      setMinimize(state);
-    });
-  };
-
-  const handleSelectedChannel = channel => {
-    chrome.storage.sync.set({ activeChannel: channel }, function() {
-      setActiveChannel(channel);
-      setChannelSwitcherOpen(false);
-    });
-  };
-
-  const closeChannelSwitcher = () => {
-    setChannelSwitcherOpen(false);
-  };
-
+  //Refs
   const constraintsRef = useRef(null);
 
-  useEffect(() => {
-    chrome.storage.sync.get(['activeChannel'], result => {
-      setActiveChannel(result.activeChannel);
+  //Functions
+  const sendMessage = (service, type, message, origin) => {
+    chrome.runtime.sendMessage({
+      service,
+      type,
+      message,
+      origin,
     });
-  }, []);
+  };
 
-  useEffect(() => {
-    chrome.storage.sync.get(['isMinimize'], result => {
-      setMinimize(result.isMinimize);
-    });
-  }, []);
+  const handleAction = (service, message) => {
+    sendMessage(service, 'mediaControl', message, 'iShuffle');
+  };
 
-  chrome.runtime.onMessage.addListener(function(request, sender) {
-    switch (request.type) {
-      case 'shuffleState':
-        setShuffleChannel(request.channel);
-        setShuffleActive(request.message === 'active' ? true : false);
-        break;
+  const openServiceSelectionMenu = () => {
+    setIsServiceSelectionOpen(!isServiceSelectionOpen);
+  };
+
+  const handleServiceSelection = service => {
+    sendMessage(service, 'activeServiceSetup', service, 'iShuffle');
+    setActiveService(service);
+    setIsServiceSelectionOpen(false);
+  };
+
+  const renderIconForService = service => {
+    switch (service) {
+      case 'Spotify':
+        return <SmallSpotifyIcon />;
+      case 'Apple':
+        return <AppleIcon />;
+      case 'YouTube':
+        return <YouTubeIcon />;
+      case 'Amazon':
+        return <AmazonIcon />;
+      case 'SoundCloud':
+        return <SoundCloudIcon />;
       default:
-        console.log('received some other message');
         break;
     }
-  });
+  };
+
+  //Effects
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener(function(request, sender) {
+      if (request.origin === 'iShuffle') {
+        console.log('received request in player', request, ' from sender ', sender);
+        switch (request.type) {
+          case 'shuffleState':
+            setShuffleActive(request.message === 'active' ? true : false);
+            break;
+          case 'playButtonState':
+            setPlaying(request.message === 'active' ? true : false);
+            break;
+          case 'activeServiceSetup':
+            setActiveService(request.service);
+            break;
+          default:
+            break;
+        }
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    chrome.storage.sync.get(['activeService'], result => {
+      setActiveService(result.activeService);
+    });
+  }, []);
 
   return (
     <Fragment>
-      <Wrapper ref={constraintsRef} />
-
+      <Wrapper isServiceSelectionOpen={isServiceSelectionOpen} ref={constraintsRef} />
       <PlayerView
-        animate={{
-          visibility: 'visible',
-          width: minimize ? 32 : 160,
-          height: minimize ? 32 : isChannelSwitcherOpen ? 240 : 160,
-        }}
-        className="playerView"
         drag
         dragConstraints={constraintsRef}
+        animate={{ height: isServiceSelectionOpen ? 112 : 56 }}
       >
+        <ActionItem type="serviceSwitcher" onClick={() => openServiceSelectionMenu()}>
+          <SelectedServiceWrapper>
+            {renderIconForService(activeService)}
+            <DropdownIcon />
+          </SelectedServiceWrapper>
+        </ActionItem>
+        <Seperator />
+        <ActionItem
+          onClick={() => handleAction(activeService, 'playPreviousTrack')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          <PreviousTrackIcon />
+        </ActionItem>
+        <ActionItem
+          onClick={() => handleAction(activeService, 'togglePlayPause')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          <TogglePlayIcon />
+        </ActionItem>
+        <ActionItem
+          onClick={() => handleAction(activeService, 'playNextTrack')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          <NextTrackIcon />
+        </ActionItem>
+        <Seperator />
+        <ActionItem
+          onClick={() => handleAction(activeService, 'shuffleTracks')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.94 }}
+          active={isShuffleActive}
+        >
+          <ShuffleTrackIcon />
+        </ActionItem>
         <AnimatePresence>
-          {isChannelSwitcherOpen && (
-            <ChannelSwitcherView
-              key="channelSwitcher"
-              initial={{ scale: 0, display: 'none' }}
-              animate={{ scale: 1, display: 'block' }}
-              exit={{ opacity: 0, display: 'none' }}
+          {isServiceSelectionOpen && (
+            <ServiceSelector
+              initial={{ height: 0, visibility: 'hidden', opacity: 0 }}
+              animate={{ height: 56, visibility: 'visible', opacity: 1 }}
+              exit={{ height: 0, visibility: 'hidden', opacity: 0 }}
             >
-              <Header>
-                <Title>Choose Service</Title>
-                <CloseView
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ opacity: 1, scale: 0.96 }}
-                  onClick={() => closeChannelSwitcher()}
-                >
-                  <CloseIcon />
-                </CloseView>
-              </Header>
-              <List>
-                {channels &&
-                  channels.map(channel => (
-                    <Channel
-                      whileTap={{ scale: 0.96 }}
-                      whileHover={{ opacity: 1 }}
-                      onClick={() => handleSelectedChannel(channel)}
-                      key={channel}
-                    >
-                      <ChannelIcon>{renderIconForService(channel)}</ChannelIcon>
-                    </Channel>
-                  ))}
-              </List>
-            </ChannelSwitcherView>
+              <ActionItem
+                onClick={() => handleServiceSelection('Spotify')}
+                whileHover={{ backgroundColor: '#1FBA5D' }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <SmallSpotifyIcon />
+              </ActionItem>
+              <ActionItem
+                onClick={() => handleServiceSelection('Apple')}
+                whileHover={{ backgroundColor: 'rgba(0, 122, 255, 1)' }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <AppleIcon />
+              </ActionItem>
+              <ActionItem
+                onClick={() => handleServiceSelection('YouTube')}
+                whileHover={{ backgroundColor: 'rgba(254, 53, 89, 1)' }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <YouTubeIcon />
+              </ActionItem>
+              <ActionItem
+                onClick={() => handleServiceSelection('Amazon')}
+                whileHover={{ backgroundColor: '#19A0B2' }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <AmazonIcon />
+              </ActionItem>
+              <ActionItem
+                onClick={() => handleServiceSelection('SoundCloud')}
+                whileHover={{ backgroundColor: 'rgba(254, 121, 25, 1)' }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <SoundCloudIcon />
+              </ActionItem>
+            </ServiceSelector>
           )}
         </AnimatePresence>
-        <MimimizeView
-          className={'minimizeIcon'}
-          isMinimized={minimize}
-          animate={
-            minimize
-              ? { backgroundColor: 'rgba(0,0,0,0.0)' }
-              : { backgroundColor: 'rgba(0,0,0,0.4)' }
-          }
-          transition={{ duration: 0 }}
-          onClick={() => handleMinimize(!minimize)}
-        >
-          {minimize ? <ExpandIcon /> : <MinimizeIcon />}
-        </MimimizeView>
-
-        <PlayerControlWheel
-          initial={false}
-          animate={minimize ? { display: 'none', opacity: 0 } : { display: 'grid', opacity: 1 }}
-        >
-          <TogglePlayButton
-            onClick={() => handleTogglePlay()}
-            whileTap={{ scale: 0.92, backgroundColor: 'rgba(255, 255, 255, 0.16)' }}
-          >
-            <TogglePlayIcon />
-          </TogglePlayButton>
-          <NextTrackButton onClick={() => handleNextTrack()} whileTap={{ scale: 0.92, opacity: 1 }}>
-            <NextTrackIcon />
-          </NextTrackButton>
-          <PreviousTrackButton
-            onClick={() => handlePreviousTrack()}
-            whileTap={{ scale: 0.92, opacity: 1 }}
-          >
-            <PreviousTrackIcon />
-          </PreviousTrackButton>
-          <ShuffleButton
-            isDisabled={activeChannel === 'Youtube'}
-            shuffleState={activeChannel === shuffleChannel && isShuffleActive}
-            onClick={() => handleShuffle()}
-            whileTap={{ scale: 0.92, opacity: 1 }}
-          >
-            <ShuffleTrackIcon />
-          </ShuffleButton>
-          <ChannelSwitcherButton
-            onClick={() => handleChannelSwitcher()}
-            whileTap={{ scale: 0.92, opacity: 1 }}
-          >
-            {renderIconForService(activeChannel)}
-            <DropdownIcon />
-          </ChannelSwitcherButton>
-        </PlayerControlWheel>
       </PlayerView>
     </Fragment>
   );
