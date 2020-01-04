@@ -1,7 +1,3 @@
-// window.addEventListener('load', () => {
-//   getShuffleState();
-// });
-
 function getShuffleState() {
   if (document.querySelector('.spoticon-shuffle-16').classList.contains('control-button--active')) {
     chrome.runtime.sendMessage({
