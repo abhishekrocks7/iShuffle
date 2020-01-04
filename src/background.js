@@ -137,14 +137,7 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
             chrome.tabs.sendMessage(tabs[i].id, request);
           }
         });
-      case 'playButtonState':
-        console.log('request is in bgScript switch case', request, ' from sender ', sender);
-        chrome.tabs.query({}, function(tabs) {
-          for (let i = 0; i < tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, request);
-          }
-        });
-        break;
+
       case 'activeServiceSetup':
         console.log('request is ', request);
         chrome.storage.sync.set({ activeService: request.service });

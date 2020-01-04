@@ -18,16 +18,6 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
             : 'inactive'
         );
         break;
-      case 'togglePlayPause':
-        sendMessage(
-          'playButtonState',
-          document
-            .querySelector('.playControls__control.playControls__play')
-            .classList.contains('playing')
-            ? 'active'
-            : 'inactive'
-        );
-        break;
       default:
         break;
     }

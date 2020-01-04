@@ -16,38 +16,12 @@ function getShuffleState() {
   }
 }
 
-function getPlayButtonState() {
-  if (document.querySelector('.spoticon-pause-16') !== null) {
-    console.log('show pause icon');
-    chrome.runtime.sendMessage({
-      service: 'Spotify',
-      type: 'playButtonState',
-      message: 'active',
-      origin: 'iShuffle',
-    });
-  } else {
-    console.log('show play icon');
-    chrome.runtime.sendMessage({
-      service: 'Spotify',
-      type: 'playButtonState',
-      message: 'inactive',
-      origin: 'iShuffle',
-    });
-  }
-}
-
 chrome.runtime.onMessage.addListener(function(request, sender) {
   if (request.origin === 'iShuffle') {
     switch (request.message) {
       case 'shuffleTracks':
         setTimeout(() => {
           getShuffleState();
-        }, 3500);
-        break;
-      case 'togglePlayPause':
-        console.log('received request for togglePlay pause ##', request);
-        setTimeout(() => {
-          getPlayButtonState();
         }, 3500);
         break;
       default:
