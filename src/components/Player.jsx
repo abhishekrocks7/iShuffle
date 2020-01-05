@@ -77,6 +77,14 @@ const SelectedServiceWrapper = styled.div`
   grid-template-columns: 20px 5px;
   grid-gap: 4px;
   align-items: center;
+
+  svg path {
+    fill: #37e1a3;
+  }
+
+  svg:last-child {
+    transform: ${props => (props.isServiceSelectionOpen ? 'rotate(180deg)' : 'roate(0deg)')};
+  }
 `;
 
 const ServiceSelector = styled(motion.div)`
@@ -180,10 +188,13 @@ function Player() {
       <PlayerView
         drag
         dragConstraints={constraintsRef}
-        animate={{ height: isServiceSelectionOpen ? 112 : 56 }}
+        animate={{
+          height: isServiceSelectionOpen ? 112 : 56,
+          borderRadius: isServiceSelectionOpen ? 12 : 32,
+        }}
       >
         <ActionItem type="serviceSwitcher" onClick={() => openServiceSelectionMenu()}>
-          <SelectedServiceWrapper>
+          <SelectedServiceWrapper isServiceSelectionOpen={isServiceSelectionOpen}>
             {renderIconForService(activeService)}
             <DropdownIcon />
           </SelectedServiceWrapper>
