@@ -151,12 +151,11 @@ function Player() {
   useEffect(() => {
     chrome.runtime.onMessage.addListener(function(request, sender) {
       if (request.origin === 'iShuffle') {
-        console.log('received request in player', request, ' from sender ', sender);
         switch (request.type) {
           case 'shuffleState':
             setShuffleActive(request.message === 'active' ? true : false);
             break;
-          case 'playButtonState':
+          case 'playState':
             setPlaying(request.message === 'active' ? true : false);
             break;
           case 'activeServiceSetup':
@@ -171,7 +170,7 @@ function Player() {
 
   useEffect(() => {
     chrome.storage.sync.get(['activeService'], result => {
-      setActiveService(result.activeService);
+      setActiveService(result.activeService ? result.activeService : 'Spotify');
     });
   }, []);
 
@@ -202,7 +201,7 @@ function Player() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.94 }}
         >
-          <TogglePlayIcon />
+          {isPlaying ? <PauseIcon /> : <PlayIcon />}
         </ActionItem>
         <ActionItem
           onClick={() => handleAction(activeService, 'playNextTrack')}

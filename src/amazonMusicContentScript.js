@@ -11,14 +11,16 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
   if (request.origin === 'iShuffle') {
     switch (request.message) {
       case 'shuffleTracks':
-        setTimeout(() => {
-          sendMessage(
-            'shuffleState',
-            document.querySelector('.shuffleButton').classList.contains('on')
-              ? 'active'
-              : 'inactive'
-          );
-        }, 2000);
+        sendMessage(
+          'shuffleState',
+          document.querySelector('.shuffleButton.on') !== null ? 'inactive' : 'active'
+        );
+        break;
+      case 'togglePlayPause':
+        sendMessage(
+          'playState',
+          document.querySelector('.playerIconPause') !== null ? 'inactive' : 'active'
+        );
         break;
       default:
         break;

@@ -20,6 +20,12 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
           );
         }, 1000);
         break;
+      case 'togglePlayPause':
+        sendMessage(
+          'playState',
+          document.querySelector('[aria-label="Pause"]') !== null ? 'inactive' : 'active'
+        );
+        break;
       default:
         break;
     }

@@ -40,7 +40,7 @@
     },
     {
       "all_frames": false,
-      "matches": ["https://www.youtube.com/watch?*"],
+      "matches": ["https://music.youtube.com/watch?*"],
       "js": ["youtubeContentScript.js"]
     }
   ],
