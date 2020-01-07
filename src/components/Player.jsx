@@ -212,7 +212,7 @@ function Player() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.94 }}
         >
-          {isPlaying ? <PauseIcon /> : <PlayIcon />}
+          <TogglePlayIcon />
         </ActionItem>
         <ActionItem
           onClick={() => handleAction(activeService, 'playNextTrack')}
