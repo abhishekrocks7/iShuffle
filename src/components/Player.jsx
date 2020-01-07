@@ -136,14 +136,27 @@ const ServiceWrapper = styled(motion.div)`
   &:hover {
     background-color: ${props =>
       props.service === 'Spotify'
-        ? '#1FBA5D'
+        ? 'rgba(31, 186, 93, 0.1);'
         : props.service === 'Apple'
-        ? '#0057ff'
+        ? 'rgba(0, 87, 255, 0.1)'
         : props.service === 'YouTube'
-        ? 'rgba(254, 53, 89, 1)'
+        ? 'rgba(254, 53, 89, 0.1)'
         : props.service === 'Amazon'
-        ? '#19A0B2'
-        : 'rgba(254, 121, 25, 1)'};
+        ? 'rgba(25, 160, 178, 0.1)'
+        : 'rgba(254, 121, 25, 0.1)'};
+
+    svg path {
+      fill: ${props =>
+        props.service === 'Spotify'
+          ? '#1FBA5D'
+          : props.service === 'Apple'
+          ? '#0057ff'
+          : props.service === 'YouTube'
+          ? 'rgba(254, 53, 89, 1)'
+          : props.service === 'Amazon'
+          ? '#19A0B2'
+          : 'rgba(254, 121, 25, 1)'};
+    }
   }
 `;
 
