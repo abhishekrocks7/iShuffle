@@ -8,7 +8,6 @@ function sendMessage(type, message) {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender) {
-  console.log('request received in content script is ', request);
   if (request.origin === 'iShuffle') {
     switch (request.message) {
       case 'shuffleTracks':

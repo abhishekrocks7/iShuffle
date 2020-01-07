@@ -6,7 +6,6 @@ function dispatchAction(tabId, code) {
 
 chrome.runtime.onMessage.addListener(function(request, sender) {
   if (request.origin === 'iShuffle') {
-    console.log('received request ', request, ' from sender ', sender);
     switch (request.type) {
       case 'mediaControl':
         chrome.tabs.query({ url: getURL(request.service, '') }, function(tabs) {
