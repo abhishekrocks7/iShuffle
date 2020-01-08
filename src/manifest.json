@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "iShuffle",
   "short_name": "iShuffle",
   "description": "App to control Apple Music, Spotify, SoundCloud and Amazon Music Media Player.",

@@ -13,12 +13,14 @@ import {
   AppleIcon,
   AmazonIcon,
   SoundCloudIcon,
+  MinimizeIcon,
+  ExpandIcon,
 } from './Icons';
 import { Fragment } from 'preact';
 
 const Wrapper = styled.div`
   position: fixed;
-  top: 68px;
+  top: 12px;
   left: 12px;
   right: 12px;
   bottom: 12px;
@@ -44,9 +46,14 @@ const PlayerView = styled(motion.div)`
   border-radius: 12px;
   z-index: 999999999999999;
   place-items: center;
+  &:hover {
+    .minimizeIcon {
+      opacity: 1;
+    }
+  }
 `;
 
-const WheelView = styled.div`
+const WheelView = styled(motion.div)`
   width: 90%;
   height: 90%;
   border-radius: 50%;
@@ -116,7 +123,7 @@ const List = styled(motion.div)`
   grid-template-rows: repeat(3, 1fr);
   place-items: center;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 24px);
 `;
 
 const ServiceWrapper = styled(motion.div)`
@@ -160,6 +167,49 @@ const ServiceWrapper = styled(motion.div)`
   }
 `;
 
+const PopupCollapseView = styled.div`
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    svg path {
+      fill: #fff;
+    }
+  }
+
+  svg path {
+    fill: rgba(255, 255, 255, 0.4);
+    transition: all 300ms ease-in-out;
+  }
+`;
+
+const MimimizeView = styled(motion.div)`
+  width: 24px;
+  height: 24px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  opacity: ${props => (props.isMinimized ? 1 : 0)};
+  transition: all 300ms ease-in-out;
+
+  svg {
+    transition: all 200ms ease-in-out;
+    transform: ${props => (props.isMinimized ? 'rotate(180deg)' : 'rotate(0deg)')};
+  }
+  svg path {
+    fill: #fff;
+  }
+`;
+
 function Player() {
   //States
   const [services] = useState(['Spotify', 'Apple', 'YouTube', 'Amazon', 'SoundCloud']);
@@ -167,6 +217,7 @@ function Player() {
   const [isShuffleActive, setShuffleActive] = useState(false);
   const [isPlaying, setPlaying] = useState(false);
   const [isServiceSelectionOpen, setIsServiceSelectionOpen] = useState(false);
+  const [isMinimized, setMinimize] = useState(false);
 
   //Refs
   const constraintsRef = useRef(null);
@@ -212,6 +263,10 @@ function Player() {
     }
   };
 
+  const handleMinimize = () => {
+    setMinimize(!isMinimized);
+  };
+
   //Effects
 
   useEffect(() => {
@@ -246,12 +301,28 @@ function Player() {
       <PlayerView
         animate={{
           visibility: 'visible',
-          height: isServiceSelectionOpen ? 240 : 144,
+          width: isMinimized ? 32 : 144,
+          height: isMinimized ? 32 : isServiceSelectionOpen ? 264 : 144,
         }}
         drag
         dragConstraints={constraintsRef}
       >
-        <WheelView>
+        <MimimizeView
+          className={'minimizeIcon'}
+          isMinimized={isMinimized}
+          animate={
+            isMinimized
+              ? { backgroundColor: 'rgba(0,0,0,0.0)', width: 32, height: 32, left: 0, bottom: 0 }
+              : { backgroundColor: 'rgba(0,0,0,0.4)', width: 24, height: 24, left: 4, bottom: 4 }
+          }
+          transition={{ duration: 0 }}
+          onClick={() => handleMinimize()}
+        >
+          <DropdownIcon isMinimized={isMinimized} />
+        </MimimizeView>
+        <WheelView
+          animate={isMinimized ? { display: 'none', opacity: 0 } : { display: 'grid', opacity: 1 }}
+        >
           <ActionItem type="serviceSwitcher" onClick={() => openServiceSelectionMenu()}>
             <SelectedServiceWrapper isServiceSelectionOpen={isServiceSelectionOpen}>
               {renderIconForService(activeService)}
@@ -298,6 +369,9 @@ function Player() {
               animate={{ scale: 1, display: 'block' }}
               exit={{ opacity: 0, display: 'none' }}
             >
+              <PopupCollapseView onClick={() => setIsServiceSelectionOpen(false)}>
+                <MinimizeIcon />
+              </PopupCollapseView>
               <List>
                 {services &&
                   services.map(service => (
